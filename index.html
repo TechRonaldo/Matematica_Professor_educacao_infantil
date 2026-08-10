@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matemática & Raciocínio Lógico • Avança SP</title>
+    
+    <!-- Configurações PWA e Ícone de Atalho -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Simulado">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3771/3771278.png">
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('PWA registrado com sucesso!'))
+            .catch((err) => console.log('Erro ao registrar PWA:', err));
+        });
+      }
+    </script>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --neon-blue: #00f0ff;
+            --neon-blue-dark: #008891;
+            --neon-green: #39ff14;
+            --neon-green-dark: #22990a;
+            --neon-pink: #ff007f;
+            --neon-pink-dark: #99004d;
+            --neon-yellow: #ffe600;
+            --neon-purple: #8a2be2;
+            --cyber-dark: #0b0f19;
+            --cyber-card: #151c2e;
+            --cyber-border: #232f48;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--cyber-dark);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(138, 43, 226, 0.25), transparent 70%),
+                linear-gradient(rgba(15, 23, 42, 0.9) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.9) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .app-window {
+            width: 100%;
+            max-width: 950px;
+            background-color: var(--cyber-card);
+            border-radius: 24px;
+            border: 2px solid var(--cyber-border);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.15), 0 15px 35px rgba(0,0,0,0.6);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .top-navbar {
+            background-color: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--cyber-border);
+            padding: 14px 24px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .stat-item { display: flex; align-items: center; gap: 6px; }
+        .stat-xp { color: var(--neon-green); }
+        .stat-gems { color: var(--neon-blue); }
+        .stat-streak { color: var(--neon-pink); }
+
+        .main-content {
+            padding: 24px;
+            min-height: 540px;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+
+        .btn-cyber {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .btn-cyber:active { transform: translateY(2px); }
+
+        .btn-blue {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-blue-dark));
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, var(--neon-green), var(--neon-green-dark));
+            color: #000;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #a855f7, var(--neon-purple));
+            color: #fff;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+        }
+
+        .btn-pink {
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-pink-dark));
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
+        }
+
+        .btn-gray {
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--cyber-border);
+        }
+
+        .screen-header { text-align: center; margin-bottom: 22px; }
+        .screen-header h2 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 28px;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .screen-header p { font-size: 14px; color: var(--text-muted); }
+
+        .cpf-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--cyber-border);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+        }
+
+        .cpf-box label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--neon-green);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .cpf-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #090d16;
+            border: 1px solid var(--cyber-border);
+            border-radius: 10px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 16px;
+            color: var(--neon-blue);
+            outline: none;
+            letter-spacing: 2px;
+        }
+
+        .cpf-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0,240,255,0.3); }
+
+        .blocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .block-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--cyber-border);
+            border-radius: 16px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .block-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .block-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #000;
+            margin-bottom: 12px;
+        }
+
+        .block-card h3 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 17px;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .block-card p { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+
+        .block-badge {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quiz-progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid var(--cyber-border);
+        }
+
+        .quiz-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .question-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--cyber-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .question-tag {
+            display: inline-block;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 15.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .option-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--cyber-border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-item:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--neon-blue);
+        }
+
+        .option-item.selected {
+            border-color: var(--neon-blue);
+            background: rgba(0, 240, 255, 0.2);
+            color: var(--neon-blue);
+        }
+
+        .option-item.correct {
+            border-color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.15);
+            color: var(--neon-green);
+        }
+
+        .option-item.wrong {
+            border-color: var(--neon-pink);
+            background: rgba(255, 0, 127, 0.15);
+            color: var(--neon-pink);
+        }
+
+        .option-prefix {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid var(--cyber-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .flashcard-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 250px;
+            margin: 18px 0;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flashcard-container.flipped .flashcard-inner { transform: rotateY(180deg); }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--cyber-border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .flashcard-front {
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text-main);
+            border-color: var(--neon-blue);
+        }
+
+        .flashcard-back {
+            background: rgba(30, 41, 59, 0.95);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-title {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .flashcard-text { font-size: 15px; line-height: 1.5; color: var(--text-main); }
+
+        .tab-menu { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid var(--cyber-border);
+            background: rgba(30, 41, 59, 0.5);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--neon-blue);
+            color: #000;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0,240,255,0.4);
+        }
+
+        .microaula-card {
+            background: rgba(15, 23, 42, 0.9);
+            border-left: 4px solid var(--neon-yellow);
+            border-radius: 12px;
+            padding: 18px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .microaula-card h4 {
+            font-family: 'Chakra Petch', sans-serif;
+            color: var(--neon-yellow);
+            margin-bottom: 8px;
+        }
+
+        .motivational-card {
+            background: rgba(255, 0, 127, 0.08);
+            border: 1px solid var(--neon-pink);
+            border-radius: 20px;
+            padding: 24px;
+            line-height: 1.7;
+            font-size: 14.5px;
+            color: var(--text-main);
+            text-align: left;
+        }
+
+        .motivational-card h3 {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 22px;
+            color: var(--neon-pink);
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .quote-box {
+            background: rgba(15, 23, 42, 0.8);
+            border-left: 4px solid var(--neon-pink);
+            padding: 12px 16px;
+            margin: 14px 0;
+            border-radius: 8px;
+            font-style: italic;
+            font-weight: 600;
+            color: var(--neon-pink);
+        }
+
+        .bottom-nav {
+            padding: 16px 24px;
+            background: rgba(11, 15, 25, 0.8);
+            border-top: 1px solid var(--cyber-border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="app-window">
+
+    <div class="top-navbar">
+        <div class="stats-bar">
+            <div class="stat-item stat-streak"><i class="fa-solid fa-fire"></i> <span id="user-streak">1</span></div>
+            <div class="stat-item stat-gems"><i class="fa-solid fa-gem"></i> <span id="user-gems">100</span></div>
+            <div class="stat-item stat-xp"><i class="fa-solid fa-bolt"></i> <span id="user-xp">0 XP</span></div>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+
+        <!-- TELA 1: Home com Seleção de Blocos -->
+        <div id="screen-home">
+            <div class="screen-header">
+                <h2>Matemática & Raciocínio Lógico</h2>
+                <p>Estilo Avança SP • Questões Gabaritadas + Teoria & Flashcards</p>
+            </div>
+
+            <!-- Identificação por CPF -->
+            <div class="cpf-box">
+                <label for="input-cpf"><i class="fa-solid fa-id-card"></i> DIGITE SEU CPF PARA LIBERAR O APLICATIVO:</label>
+                <input type="text" id="input-cpf" class="cpf-input" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+            </div>
+
+            <div class="blocks-grid">
+                <!-- Bloco 1 -->
+                <div class="block-card" onclick="openModuleHub(1)">
+                    <div>
+                        <div class="block-icon" style="background: var(--neon-blue);">
+                            <i class="fa-solid fa-hashtag"></i>
+                        </div>
+                        <h3>Bloco 1: Aritmética & Frações</h3>
+                        <p>10 Qs • Operações Básicas, Decimais, Frações, Horas e Volume.</p>
+                    </div>
+                    <span class="block-badge" style="background: rgba(0,240,255,0.15); color: var(--neon-blue);">Questões 01 a 10</span>
+                </div>
+
+                <!-- Bloco 2 -->
+                <div class="block-card" onclick="openModuleHub(2)">
+                    <div>
+                        <div class="block-icon" style="background: var(--neon-green);">
+                            <i class="fa-solid fa-percent"></i>
+                        </div>
+                        <h3>Bloco 2: Porcentagem & Proporção</h3>
+                        <p>10 Qs • Porcentagem, Descontos, Escala e Regra de Três.</p>
+                    </div>
+                    <span class="block-badge" style="background: rgba(57,255,20,0.15); color: var(--neon-green);">Questões 11 a 20</span>
+                </div>
+
+                <!-- Bloco 3 -->
+                <div class="block-card" onclick="openModuleHub(3)">
+                    <div>
+                        <div class="block-icon" style="background: var(--neon-yellow);">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <h3>Bloco 3: Juros & Álgebra</h3>
+                        <p>10 Qs • Juros Simples/Compostos, Equações e Polinômios.</p>
+                    </div>
+                    <span class="block-badge" style="background: rgba(255,230,0,0.15); color: var(--neon-yellow);">Questões 21 a 30</span>
+                </div>
+
+                <!-- Bloco 4 -->
+                <div class="block-card" onclick="openModuleHub(4)">
+                    <div>
+                        <div class="block-icon" style="background: var(--neon-purple);">
+                            <i class="fa-solid fa-draw-polygon"></i>
+                        </div>
+                        <h3>Bloco 4: Geometria & Estatística</h3>
+                        <p>10 Qs • Geometria Plana/Espacial, Média, Mediana e Gráficos.</p>
+                    </div>
+                    <span class="block-badge" style="background: rgba(138,43,226,0.15); color: #d8b4fe;">Questões 31 a 40</span>
+                </div>
+
+                <!-- Bloco 5 -->
+                <div class="block-card" onclick="openModuleHub(5)">
+                    <div>
+                        <div class="block-icon" style="background: var(--neon-pink);">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <h3>Bloco 5: Lógica & Combinatória</h3>
+                        <p>10 Qs • Tabela Verdade, Negação, Anagramas e Probabilidade.</p>
+                    </div>
+                    <span class="block-badge" style="background: rgba(255,0,127,0.15); color: var(--neon-pink);">Questões 41 a 50</span>
+                </div>
+
+                <!-- Bloco 6: PROVA OFICIAL RECENTE AVANÇA SP (03/2025) -->
+                <div class="block-card" onclick="openModuleHub(6)" style="border-color: var(--neon-green); background: rgba(57, 255, 20, 0.08);">
+                    <div>
+                        <div class="block-icon" style="background: var(--neon-green);">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <h3>Bloco 6: Prova Oficial Recente Avança SP</h3>
+                        <p>Questões de 06 a 10 aplicadas na prova oficial (Cerquilho 2025) com Gabarito Oficial.</p>
+                    </div>
+                    <span class="block-badge" style="background: rgba(57,255,20,0.2); color: var(--neon-green);">Prova Oficial Cerquilho</span>
+                </div>
+            </div>
+
+            <!-- BOTÃO EXCLUSIVO PARA MENSAGEM MOTIVACIONAL -->
+            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-cyber btn-pink" onclick="openMotivationalScreen()">
+                    🌟 Carta de Inspiração e Superação (Ler Mensagem)
+                </button>
+                <button class="btn-cyber btn-purple" onclick="startQuizBlock('maratona')">
+                    🚀 Maratona Geral (55 Questões do Simulado)
+                </button>
+            </div>
+        </div>
+
+        <!-- TELA 2: Hub do Bloco (Abas de Teoria, Flashcards, Microaula e Quiz) -->
+        <div id="screen-hub" class="hidden">
+            <div class="screen-header">
+                <h2 id="hub-title">Bloco 1</h2>
+                <p>Estude os conceitos antes de testar seus conhecimentos no simulado</p>
+            </div>
+
+            <div class="tab-menu">
+                <button class="tab-btn active" id="tab-btn-summary" onclick="switchHubTab('summary')">📖 Resumo</button>
+                <button class="tab-btn" id="tab-btn-cards" onclick="switchHubTab('cards')">🎴 Flashcards</button>
+                <button class="tab-btn" id="tab-btn-micro" onclick="switchHubTab('micro')">🎙️ Microaula</button>
+                <button class="tab-btn" id="tab-btn-quiz" onclick="switchHubTab('quiz')">✏️ Simulado</button>
+            </div>
+
+            <!-- Conteúdo Aba Resumo -->
+            <div id="hub-tab-summary">
+                <div class="question-card" id="summary-content">
+                    <!-- Preenchido via JS -->
+                </div>
+            </div>
+
+            <!-- Conteúdo Aba Flashcards -->
+            <div id="hub-tab-cards" class="hidden">
+                <div class="flashcard-container" id="flashcard-box" onclick="flipCard()">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <span class="question-tag" id="card-tag">Card 1</span>
+                            <h3 class="flashcard-title" id="card-question">Pergunta...</h3>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">(Clique para girar o cartão 🔄)</p>
+                        </div>
+                        <div class="flashcard-back">
+                            <span class="question-tag" style="border-color: var(--neon-green); color: var(--neon-green);">Resposta</span>
+                            <p class="flashcard-text" id="card-answer">Resposta...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-cyber btn-gray" onclick="prevFlashcard()">← Anterior</button>
+                    <button class="btn-cyber btn-blue" onclick="nextFlashcard()">Próximo →</button>
+                </div>
+            </div>
+
+            <!-- Conteúdo Aba Microaula -->
+            <div id="hub-tab-micro" class="hidden">
+                <div class="microaula-card" id="micro-content">
+                    <!-- Preenchido via JS -->
+                </div>
+            </div>
+
+            <!-- Conteúdo Aba Quiz -->
+            <div id="hub-tab-quiz" class="hidden">
+                <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="quiz-progress"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span id="quiz-counter" style="font-weight: 700; color: var(--text-muted); font-size: 13px;">Questão 1 de 10</span>
+                    <span id="quiz-block-title" style="font-weight: 700; color: var(--neon-blue); font-size: 13px;">Bloco 1</span>
+                </div>
+
+                <div class="question-card">
+                    <span class="question-tag" id="quiz-topic">Assunto</span>
+                    <div class="question-text" id="quiz-question-text">Carregando questão...</div>
+                </div>
+
+                <div class="options-list" id="quiz-options-container"></div>
+
+                <div id="quiz-feedback-box" class="hidden" style="margin-top: 16px; padding: 16px; border-radius: 12px; line-height: 1.5; font-size: 13.5px; font-weight: 600;"></div>
+            </div>
+        </div>
+
+        <!-- TELA MOTIVACIONAL EXCLUSIVA -->
+        <div id="screen-motivation" class="hidden">
+            <div class="screen-header">
+                <h2 style="color: var(--neon-pink);">Carta de Inspiração & Superação</h2>
+                <p>Mensagem dedicada a você que está lutando pela sua aprovação</p>
+            </div>
+
+            <div class="motivational-card">
+                <h3>🌷 Parabéns por Ter Chegado Até Aqui!</h3>
+                <p><strong>Se você está fazendo este simulado, é porque decidiu lutar pelo seu sonho.</strong> E essa decisão já coloca você à frente de muitas pessoas que desistiram antes mesmo de tentar.</p>
+                <p style="margin-top: 8px;">
+                    É normal sentir medo da prova de Matemática. Ela é uma das disciplinas que mais desafiam os candidatos, mas também é uma das que mais recompensam quem estuda com persistência. Cada erro cometido agora é uma oportunidade de aprendizado. No dia da prova, esses erros podem se transformar em acertos que farão toda a diferença na sua classificação.
+                </p>
+                
+                <div class="quote-box">
+                    "Não permita que uma questão difícil faça você duvidar da sua capacidade. Respire, leia com atenção, organize o raciocínio e siga em frente. Muitas vezes, a aprovação não pertence ao candidato que sabe tudo, mas àquele que mantém a calma, acredita em si mesmo e não desiste diante das dificuldades."
+                </div>
+
+                <p>Lembre-se: cada minuto dedicado aos estudos é um investimento no seu futuro. A vaga que você tanto deseja pode estar a poucos pontos de distância, e esses pontos podem nascer exatamente do esforço que você está fazendo hoje.</p>
+
+                <div class="quote-box">
+                    "Acredite: você é mais forte do que imagina, mais preparado do que pensa e mais próximo da aprovação do que consegue enxergar neste momento."
+                </div>
+
+                <p style="text-align: center; font-weight: 800; color: var(--neon-pink); margin-top: 12px; font-size: 15px;">
+                    Continue firme. Continue estudando. Continue acreditando. O seu sonho merece o seu melhor esforço hoje! ✨
+                </p>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn-cyber btn-green" onclick="showHomeScreen()">🔄 Voltar ao Menu Principal</button>
+            </div>
+        </div>
+
+        <!-- TELA 3: Tela de Resultado -->
+        <div id="screen-result" class="hidden">
+            <div class="screen-header">
+                <h2 style="color: var(--neon-green);">Simulado Concluído! 🏆</h2>
+                <p id="res-cpf-tag" style="font-weight: 700; color: var(--neon-blue); margin-top: 4px;"></p>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="font-size: 56px; font-weight: 900; color: var(--neon-green); font-family: 'Chakra Petch', sans-serif;" id="res-score-pct">
+                    0%
+                </div>
+                <p id="res-score-details" style="font-weight: 600; color: var(--text-muted);">Você acertou 0 de 10 questões (0% de acertos)!</p>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn-cyber btn-green" onclick="showHomeScreen()">🔄 Voltar ao Menu Principal</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <button class="btn-cyber btn-gray" id="btn-back-home" onclick="showHomeScreen()">
+            <i class="fa-solid fa-house"></i> Início
+        </button>
+        <button class="btn-cyber btn-green hidden" id="btn-quiz-next" onclick="nextQuestion()">
+            Verificar Resposta →
+        </button>
+    </div>
+</div>
+
+<script>
+    let userState = { streak: 1, gems: 100, xp: 0 };
+    let audioCtx = null;
+    let candidatoCPF = "";
+
+    /* CONTROLE DE ESTADO DO QUIZ */
+    let questionAnswered = false;
+    let selectedOptionIndex = null;
+    let quizScore = 0;
+    let activeModule = 1;
+    let currentQuestionsList = [];
+    let currentQuestionIndex = 0;
+    let currentCardIndex = 0;
+
+    function mascaraCPF(input) {
+        let value = input.value.replace(/\D/g, "");
+        if (value.length > 11) value = value.slice(0, 11);
+        value = value.replace(/(\d{3})(\d)/, "$1.$2");
+        value = value.replace(/(\d{3})(\d)/, "$1.$2");
+        value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        input.value = value;
+    }
+
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/[^\d]+/g, '');
+        if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+        let soma = 0, resto;
+        for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.substring(9, 10))) return false;
+        soma = 0;
+        for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.substring(10, 11))) return false;
+        return true;
+    }
+
+    function playTechSound(type) {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            } else if (type === 'pop') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.06);
+            }
+        } catch (e) {}
+    }
+
+    function addXP(amount) {
+        userState.xp += amount;
+        userState.gems += Math.floor(amount / 2);
+        document.getElementById('user-xp').innerText = userState.xp + " XP";
+        document.getElementById('user-gems').innerText = userState.gems;
+    }
+
+    /* BANCO DE DADOS DE CONTEÚDO PEDAGÓGICO (MÓDULOS) */
+    const modulesData = {
+        1: {
+            title: "Bloco 1: Aritmética & Frações",
+            summary: `
+                <h4 style="color: var(--neon-blue); margin-bottom: 10px;">📚 Resumo Teórico Express</h4>
+                <ul style="padding-left: 20px; font-size: 13.5px; line-height: 1.8; color: var(--text-main);">
+                    <li><strong>Valor Posicional:</strong> O valor relativo depende da ordem (ex: em 8.475.921, o algarismo 7 está nas dezenas de milhar = 70.000).</li>
+                    <li><strong>Conversão de Unidades:</strong> 1 t = 1.000 kg; 1 ha = 10.000 m²; 1 m³ = 1.000 Litros.</li>
+                    <li><strong>Operações com Frações:</strong> Usa-se o MMC dos denominadores para somar/subtrair.</li>
+                    <li><strong>Fração Irredutível:</strong> Simplifica-se dividindo pelo MDC. Ex: 84/126 ÷ 42 = 2/3.</li>
+                </ul>
+            `,
+            flashcards: [
+                { q: "Quanto vale 1 hectare (ha) em m²?", a: "1 ha = 10.000 m²." },
+                { q: "Quantos litros há em 1 m³?", a: "1 m³ = 1.000 Litros." },
+                { q: "Como converter fração em número decimal?", a: "Divida o numerador pelo denominador (ex: 7/8 = 0,875)." },
+                { q: "Como calcular o volume de um paralelepípedo?", a: "Volume = Comprimento × Largura × Altura." }
+            ],
+            microaula: `
+                <h4>🎙️ Microaula Express: Operações e Conversões na Avança SP</h4>
+                <p style="margin-top: 6px;">A banca Avança SP cobra conversão de unidades (toneladas para kg, m² para hectares) e capacidade em litros. Lembre-se de simplificar frações pelo MDC para chegar à forma irredutível.</p>
+            `
+        },
+        2: {
+            title: "Bloco 2: Porcentagem & Proporção",
+            summary: `
+                <h4 style="color: var(--neon-green); margin-bottom: 10px;">📚 Resumo Teórico Express</h4>
+                <ul style="padding-left: 20px; font-size: 13.5px; line-height: 1.8; color: var(--text-main);">
+                    <li><strong>Descontos Sucessivos:</strong> Dois descontos de 10% equivalem a 19% (e não 20%!).</li>
+                    <li><strong>Escala Cartográfica:</strong> Escala = Distância no mapa / Distância real. Ex: 1:50.000 -> 1 cm = 50.000 cm = 500 m = 0,5 km.</li>
+                    <li><strong>Grandezas Inversas:</strong> Se a velocidade diminui, o tempo aumenta.</li>
+                </ul>
+            `,
+            flashcards: [
+                { q: "Dois descontos sucessivos de 10% equivalem a quanto?", a: "Equivalem a um desconto único de 19%." },
+                { q: "Se a velocidade cai, o tempo de viagem aumenta ou diminui?", a: "Aumenta! São grandezas inversamente proporcional." }
+            ],
+            microaula: `
+                <h4>🎙️ Microaula Express: Porcentagem e Proporção</h4>
+                <p style="margin-top: 6px;">Cuidado com pegadinhas de porcentagem acumulada! Lembre-se de converter cm para km ao aplicar escalas no mapa.</p>
+            `
+        },
+        3: {
+            title: "Bloco 3: Juros & Álgebra",
+            summary: `
+                <h4 style="color: var(--neon-yellow); margin-bottom: 10px;">📚 Resumo Teórico Express</h4>
+                <ul style="padding-left: 20px; font-size: 13.5px; line-height: 1.8; color: var(--text-main);">
+                    <li><strong>Juros Simples:</strong> J = C × i × t. Montante M = C + J.</li>
+                    <li><strong>Juros Compostos:</strong> M = C(1 + i)ᵗ.</li>
+                    <li><strong>Polinômios:</strong> Multiplica-se usando a propriedade distributiva.</li>
+                </ul>
+            `,
+            flashcards: [
+                { q: "Qual a fórmula dos Juros Simples?", a: "J = C × i × t." },
+                { q: "Qual a fórmula do Montante nos Juros Compostos?", a: "M = C(1 + i)ᵗ." }
+            ],
+            microaula: `
+                <h4>🎙️ Microaula Express: Juros Simples x Compostos</h4>
+                <p style="margin-top: 6px;">Fique atenta ao regime de juros solicitado no enunciado e à unidade da taxa (ao mês ou ao ano).</p>
+            `
+        },
+        4: {
+            title: "Bloco 4: Geometria & Estatística",
+            summary: `
+                <h4 style="color: var(--neon-purple); margin-bottom: 10px;">📚 Resumo Teórico Express</h4>
+                <ul style="padding-left: 20px; font-size: 13.5px; line-height: 1.8; color: var(--text-main);">
+                    <li><strong>Pitágoras:</strong> a² = b² + c² (catetos 6 e 8 -> hipotenusa 10).</li>
+                    <li><strong>Perímetro Círculo:</strong> C = 2πr.</li>
+                    <li><strong>Estatística:</strong> Média (soma/total); Moda (mais frequente); Mediana (elemento central).</li>
+                </ul>
+            `,
+            flashcards: [
+                { q: "Qual a fórmula do perímetro do círculo?", a: "C = 2 × π × r." },
+                { q: "Qual figura possui infinitos eixos de simetria?", a: "O Círculo." }
+            ],
+            microaula: `
+                <h4>🎙️ Microaula Express: Geometria e Estatística</h4>
+                <p style="margin-top: 6px;">Sempre coloque os dados em ordem crescente antes de calcular a mediana!</p>
+            `
+        },
+        5: {
+            title: "Bloco 5: Lógica & Combinatória",
+            summary: `
+                <h4 style="color: var(--neon-pink); margin-bottom: 10px;">📚 Resumo Teórico Express</h4>
+                <ul style="padding-left: 20px; font-size: 13.5px; line-height: 1.8; color: var(--text-main);">
+                    <li><strong>Condicional (p -> q):</strong> Só é falsa quando V -> F (Vera Fischer).</li>
+                    <li><strong>Negação do "Se... Então":</strong> Mantém a 1ª E nega a 2ª (Regra do Mané).</li>
+                    <li><strong>Anagramas:</strong> P_n = n! (Ex: LÓGICA = 6! = 720).</li>
+                </ul>
+            `,
+            flashcards: [
+                { q: "Como negar a proposição Se... Então?", a: "Mantém a 1ª E nega a 2ª (Regra do Mané)." },
+                { q: "Qual a negação de 'Todos os alunos foram aprovados'?", a: "Pelo menos um aluno NÃO foi aprovado." }
+            ],
+            microaula: `
+                <h4>🎙️ Microaula Express: Raciocínio Lógico Prático</h4>
+                <p style="margin-top: 6px;">Negar um quantificador universal (TODO) exige apenas a existência de UMA exceção.</p>
+            `
+        },
+        6: {
+            title: "Bloco 6: Prova Oficial Recente (Avança SP 2025)",
+            summary: `
+                <h4 style="color: var(--neon-green); margin-bottom: 10px;">📚 Resumo Teórico Oficial</h4>
+                <ul style="padding-left: 20px; font-size: 13.5px; line-height: 1.8; color: var(--text-main);">
+                    <li><strong>Divisão Proporcional:</strong> Soma-se as partes e divide-se o valor total pelo número de partes.</li>
+                    <li><strong>Proporcionalidade Direta:</strong> Se o tempo de produção aumenta, a quantidade de peças produzidas aumenta na mesma proporção.</li>
+                    <li><strong>Perímetro com Moldura:</strong> Perímetro = $2 \\times (L + 2x) + 2 \\times (H + 2x)$.</li>
+                    <li><strong>Sequência de Quadrados Perfeitos:</strong> $1^2, 2^2, 3^2, 4^2, 5^2, 6^2, ...$ ($n^2$).</li>
+                    <li><strong>MMC e MDC:</strong> Fatoração simultânea em números primos.</li>
+                </ul>
+            `,
+            flashcards: [
+                { q: "Qual o 6º termo da sequência 1, 4, 9, 16, 25...?", a: "36 (pois 6² = 36)." },
+                { q: "Qual o MMC e MDC entre 50 e 105?", a: "MMC = 1.050 e MDC = 5." },
+                { q: "Se 20 brindes são feitos em 2h, quantos são feitos em 3h?", a: "30 brindes (10 brindes por hora)." }
+            ],
+            microaula: `
+                <h4>🎙️ Microaula Express: Análise das Questões Oficiais de 2025</h4>
+                <p style="margin-top: 6px;">As questões da Prova Oficial do Concurso de Cerquilho (Avança SP) cobraram raciocínio proporcional direto, cálculo de perímetro de molduras com faixa $x$, padrões de sequências quadráticas e cálculo de MMC/MDC por fatoração prima.</p>
+            `
+        }
+    };
+
+    /* BANCO DE QUESTÕES COMPLETO (1 a 55) */
+    const allQuestionsDatabase = [
+        // Bloco 1 (Q1 - Q10)
+        { block: 1, topic: "Aritmética Básica", text: "1. Carlos comprou 15 caixas de canetas, contendo 24 em cada. Vendeu 180 e dividiu o restante igualmente entre 6 funcionários. Quantas canetas cada um recebeu?", options: ["A) 20", "B) 25", "C) 30", "D) 35", "E) 40"], correct: 2, explanation: "Gabarito C: Total = 15 x 24 = 360. Sobraram = 360 - 180 = 180. Cada funcionário = 180 / 6 = 30 unidades." },
+        { block: 1, topic: "Valor Posicional", text: "2. No número 8.475.921, qual é o valor relativo (ou posicional) do algarismo 7?", options: ["A) 700", "B) 7.000", "C) 70.000", "D) 700.000", "E) 7.000.000"], correct: 2, explanation: "Gabarito C: O 7 ocupa a dezena de milhar (7 x 10.000 = 70.000)." },
+        { block: 1, topic: "Arredondamento", text: "3. O número de agasalhos recolhidos foi 3.847. Arredondando para a centena mais próxima, obtém-se:", options: ["A) 3.800", "B) 3.840", "C) 3.850", "D) 3.900", "E) 4.000"], correct: 0, explanation: "Gabarito A: Como a dezena/unidade é 47 (menor que 50), arredonda-se para baixo = 3.800." },
+        { block: 1, topic: "Unidades de Medida", text: "4. Um caminhão suporta 4,5 toneladas. Se já foi carregado com 2.850 kg, quantos quilos ainda podem ser adicionados?", options: ["A) 1.550 kg", "B) 1.650 kg", "C) 1.750 kg", "D) 2.350 kg", "E) 2.650 kg"], correct: 1, explanation: "Gabarito B: 4,5 t = 4.500 kg. Sobra = 4.500 - 2.850 = 1.650 kg." },
+        { block: 1, topic: "Medidas de Tempo", text: "5. Uma reunião começou às 14h45min e terminou às 17h20min. A duração total da reunião foi de:", options: ["A) 2h 15min", "B) 2h 25min", "C) 2h 35min", "D) 2h 45min", "E) 3h 05min"], correct: 2, explanation: "Gabarito C: Das 14h45 às 15h (15 min) + das 15h às 17h (2h) + das 17h às 17h20 (20 min) = 2h 35min." },
+        { block: 1, topic: "Área e Hectares", text: "6. Um terreno retangular de 25 m por 40 m possui área equivalente a quantos hectares (ha)? (1 ha = 10.000 m²)", options: ["A) 0,01 ha", "B) 0,1 ha", "C) 1,0 ha", "D) 10 ha", "E) 100 ha"], correct: 1, explanation: "Gabarito B: Área = 25 x 40 = 1.000 m². Em ha = 1.000 / 10.000 = 0,1 ha." },
+        { block: 1, topic: "Volume e Capacidade", text: "7. Um reservatório de 3 m x 2 m x 1,5 m possui capacidade máxima de quantos litros de água?", options: ["A) 900 L", "B) 4.500 L", "C) 6.000 L", "D) 9.000 L", "E) 12.000 L"], correct: 3, explanation: "Gabarito D: Volume = 3 x 2 x 1,5 = 9 m³. Como 1 m³ = 1.000 L, temos 9.000 Litros." },
+        { block: 1, topic: "Frações Equivalentes", text: "8. A fração irredutível equivalente a 84/126 é:", options: ["A) 3/4", "B) 2/3", "C) 4/5", "D) 5/6", "E) 1/2"], correct: 1, explanation: "Gabarito B: Dividindo numerador e denominador por 42 (MDC), temos 2/3." },
+        { block: 1, topic: "Operações com Frações", text: "9. Mariana gastou 1/3 do salário com aluguel e 2/5 com alimentação. Que fração do salário sobrou?", options: ["A) 3/15", "B) 4/15", "C) 7/15", "D) 8/15", "E) 11/15"], correct: 1, explanation: "Gabarito B: Gastos = 1/3 + 2/5 = 11/15. Sobrou = 1 - 11/15 = 4/15." },
+        { block: 1, topic: "Fração para Decimal", text: "10. A conversão da fração 7/8 para a forma decimal resulta em:", options: ["A) 0,78", "B) 0,825", "C) 0,85", "D) 0,875", "E) 0,88"], correct: 3, explanation: "Gabarito D: Dividindo 7 por 8 obtém-se 0,875." },
+
+        // Bloco 2 (Q11 - Q20)
+        { block: 2, topic: "Expressões Decimais", text: "11. O resultado da expressão (0,75 + 1/2) x 0,4 é igual a:", options: ["A) 0,25", "B) 0,5", "C) 0,75", "D) 1,0", "E) 1,25"], correct: 1, explanation: "Gabarito B: (0,75 + 0,5) x 0,4 = 1,25 x 0,4 = 0,5." },
+        { block: 2, topic: "Porcentagem Básica", text: "12. Um produto de R$ 250,00 sofreu um reajuste de 12%. Qual o novo valor do produto?", options: ["A) R$ 262,00", "B) R$ 270,00", "C) R$ 275,00", "D) R$ 280,00", "E) R$ 285,00"], correct: 3, explanation: "Gabarito D: Aumento = 12% de 250 = 30. Novo valor = 250 + 30 = R$ 280,00." },
+        { block: 2, topic: "Descontos Sucessivos", text: "13. Um produto teve 10% de desconto à vista e mais 10% pelo cupom do app. Qual o desconto total sobre o valor original?", options: ["A) 18%", "B) 19%", "C) 20%", "D) 21%", "E) 22%"], correct: 1, explanation: "Gabarito B: 100% -> 90% -> 90% - 9% = 81%. Desconto total acumulado = 19%." },
+        { block: 2, topic: "Porcentagem Inversa", text: "14. Após um desconto de 15%, uma calça passou a custar R$ 102,00. Qual era o valor original?", options: ["A) R$ 115,00", "B) R$ 117,30", "C) R$ 120,00", "D) R$ 122,00", "E) R$ 125,00"], correct: 2, explanation: "Gabarito C: 85% do preço = 102 -> Preço = 102 / 0,85 = R$ 120,00." },
+        { block: 2, topic: "Subtração Decimal", text: "15. Pagou-se uma compra com R$ 100,00 e o troco foi de R$ 23,60. Qual o valor gasto?", options: ["A) R$ 75,40", "B) R$ 76,40", "C) R$ 76,60", "D) R$ 77,40", "E) R$ 83,40"], correct: 1, explanation: "Gabarito B: 100,00 - 23,60 = R$ 76,40." },
+        { block: 2, topic: "Razão e Proporção", text: "16. A razão entre homens e mulheres é 3/5. Sabendo que há 45 mulheres, qual o total de funcionários?", options: ["A) 60", "B) 63", "C) 72", "D) 75", "E) 81"], correct: 2, explanation: "Gabarito C: H/45 = 3/5 -> H = 27 homens. Total = 27 + 45 = 72 funcionários." },
+        { block: 2, topic: "Divisão Proporcional", text: "17. R$ 18.000,00 divididos entre sócios A (3 anos) e B (6 anos) proporcionalmente. Quanto B recebe?", options: ["A) R$ 6.000,00", "B) R$ 8.000,00", "C) R$ 10.000,00", "D) R$ 12.000,00", "E) R$ 14.000,00"], correct: 3, explanation: "Gabarito D: Total de anos = 9. Por ano = 18.000 / 9 = 2.000. B recebe 6 x 2.000 = R$ 12.000,00." },
+        { block: 2, topic: "Escala Cartográfica", text: "18. No mapa de escala 1 : 50.000, a distância entre duas cidades é 8 cm. A distância real é:", options: ["A) 400 m", "B) 4 km", "C) 40 km", "D) 400 km", "E) 4.000 km"], correct: 1, explanation: "Gabarito B: 8 cm x 50.000 = 400.000 cm = 4.000 m = 4 km." },
+        { block: 2, topic: "Regra de Três Inversa", text: "19. A 80 km/h o percurso é feito em 3h. A 60 km/h, o percurso será feito em quanto tempo?", options: ["A) 2h 15min", "B) 3h 30min", "C) 4h", "D) 4h 30min", "E) 5h"], correct: 2, explanation: "Gabarito C: Distância = 80 x 3 = 240 km. Novo tempo = 240 / 60 = 4 horas." },
+        { block: 2, topic: "Regra de Três Direta", text: "20. Para pintar 45 m² usam-se 6 L de tinta. Quantos litros serão necessários para 75 m²?", options: ["A) 8 L", "B) 9 L", "C) 10 L", "D) 12 L", "E) 15 L"], correct: 2, explanation: "Gabarito C: 45 / 75 = 6 / x -> 3/5 = 6/x -> 3x = 30 -> x = 10 Litros." },
+
+        // Bloco 3 (Q21 - Q30)
+        { block: 3, topic: "Regra de Três Composta", text: "21. 8 operários em 6 h/dia produzem 480 panfletos em 5 dias. Quantos panfletos farão 10 operários em 8 h/dia por 6 dias?", options: ["A) 800", "B) 900", "C) 960", "D) 1.020", "E) 1.200"], correct: 2, explanation: "Gabarito C: 480 / x = (8/10) x (6/8) x (5/6) -> 480/x = 1/2 -> x = 960 panfletos." },
+        { block: 3, topic: "Regra de Três Composta", text: "22. 5 torneiras despejam 800 L em 4 horas. Quantas torneiras idênticas despejarão 1.200 L em 3 horas?", options: ["A) 6", "B) 8", "C) 10", "D) 12", "E) 15"], correct: 2, explanation: "Gabarito C: (5 x 4) / 800 = (T x 3) / 1200 -> 20/800 = 3T/1200 -> T = 10 torneiras." },
+        { block: 3, topic: "Juros Simples", text: "23. Capital de R$ 2.000,00 aplicado a juros simples de 1,5% a.m. por 8 meses gera montante de:", options: ["A) R$ 2.120,00", "B) R$ 2.160,00", "C) R$ 2.240,00", "D) R$ 2.320,00", "E) R$ 2.400,00"], correct: 2, explanation: "Gabarito C: J = 2000 x 0,015 x 8 = 240. Montante = 2000 + 240 = R$ 2.240,00." },
+        { block: 3, topic: "Taxa de Juros Simples", text: "24. Aplicação de R$ 5.000,00 por 6 meses gerou R$ 600,00 de juros simples. Qual a taxa mensal?", options: ["A) 1,2% a.m.", "B) 1,5% a.m.", "C) 1,8% a.m.", "D) 2,0% a.m.", "E) 2,5% a.m."], correct: 3, explanation: "Gabarito D: 600 = 5000 x i x 6 -> 600 = 30000i -> i = 0,02 = 2,0% a.m." },
+        { block: 3, topic: "Juros Compostos", text: "25. Montante de R$ 1.000,00 aplicado em juros compostos a 10% a.m. por 2 meses é de:", options: ["A) R$ 1.150,00", "B) R$ 1.200,00", "C) R$ 1.210,00", "D) R$ 1.220,00", "E) R$ 1.250,00"], correct: 2, explanation: "Gabarito C: M = 1000 x (1,10)² = 1000 x 1,21 = R$ 1.210,00." },
+        { block: 3, topic: "Diferença de Juros", text: "26. Aplicação de R$ 4.000 por 2 anos a 5% a.a. A diferença entre juros compostos e simples é:", options: ["A) R$ 5,00", "B) R$ 10,00", "C) R$ 15,00", "D) R$ 20,00", "E) R$ 25,00"], correct: 1, explanation: "Gabarito B: J. Simples = 400. J. Compostos = 4000 x (1,05)² - 4000 = 410. Diferença = R$ 10,00." },
+        { block: 3, topic: "Soma de Polinômios", text: "27. P(x) = 3x² - 5x + 4 e Q(x) = 2x² + 3x - 7. O resultado de P(x) + Q(x) é:", options: ["A) 5x² - 8x - 3", "B) 5x² - 2x - 3", "C) 5x² + 2x + 11", "D) x² - 8x + 11", "E) x² - 2x - 3"], correct: 1, explanation: "Gabarito B: (3x² + 2x²) + (-5x + 3x) + (4 - 7) = 5x² - 2x - 3." },
+        { block: 3, topic: "Multiplicação Polinomial", text: "28. Efetuando a multiplicação (2x - 3)(x + 4), obtém-se:", options: ["A) 2x² + 5x - 12", "B) 2x² - 5x - 12", "C) 2x² + 11x - 12", "D) 2x² + 5x + 12", "E) 2x² - 12"], correct: 0, explanation: "Gabarito A: 2x² + 8x - 3x - 12 = 2x² + 5x - 12." },
+        { block: 3, topic: "Sistema de Equações", text: "29. Estacionamento com carros (4 rodas) e motos (2 rodas). Total de 30 veículos e 100 rodas. Quantos carros há?", options: ["A) 10", "B) 15", "C) 18", "D) 20", "E) 22"], correct: 3, explanation: "Gabarito D: C + M = 30 e 4C + 2M = 100. 4C + 2(30-C) = 100 -> 2C = 40 -> C = 20 carros." },
+        { block: 3, topic: "Equação do 1º Grau", text: "30. A solução da equação 4(x - 2) + 3 = 2(x + 5) - 1 é:", options: ["A) x = 5", "B) x = 6", "C) x = 7", "D) x = 8", "E) x = 9"], correct: 2, explanation: "Gabarito C: 4x - 8 + 3 = 2x + 10 - 1 -> 4x - 5 = 2x + 9 -> 2x = 14 -> x = 7." },
+
+        // Bloco 4 (Q31 - Q40)
+        { block: 4, topic: "Equação do 2º Grau", text: "31. As raízes reais da equação x² - 7x + 12 = 0 são:", options: ["A) -3 e -4", "B) -3 e 4", "C) 3 e -4", "D) 3 e 4", "E) 2 e 5"], correct: 3, explanation: "Gabarito D: Soma = 7, Produto = 12. As raízes são 3 e 4." },
+        { block: 4, topic: "Pitágoras e Área", text: "32. Terreno em triângulo retângulo com catetos de 6 m e 8 m. Sua área e hipotenusa medem:", options: ["A) 24 m² e 10 m", "B) 48 m² e 10 m", "C) 24 m² e 12 m", "D) 48 m² e 14 m", "E) 14 m² e 10 m"], correct: 0, explanation: "Gabarito A: Área = (6 x 8)/2 = 24 m². Hipotenusa² = 6² + 8² = 100 -> h = 10 m." },
+        { block: 4, topic: "Circunferência", text: "33. Perímetro de uma praça circular é 31,4 m (usando π = 3,14). O raio mede:", options: ["A) 2,5 m", "B) 5 m", "C) 7,5 m", "D) 10 m", "E) 15,7 m"], correct: 1, explanation: "Gabarito B: C = 2πr -> 31,4 = 2 x 3,14 x r -> 31,4 = 6,28r -> r = 5 m." },
+        { block: 4, topic: "Geometria Espacial", text: "34. Ao dobrar a aresta de um reservatório cúbico, seu volume fica quantas vezes maior?", options: ["A) 2 vezes", "B) 4 vezes", "C) 6 vezes", "D) 8 vezes", "E) 16 vezes"], correct: 3, explanation: "Gabarito D: V1 = a³. V2 = (2a)³ = 8a³. Ficou 8 vezes maior." },
+        { block: 4, topic: "Simetria", text: "35. Qual figura geométrica plana possui infinitos eixos de simetria por reflexão?", options: ["A) Quadrado", "B) Triângulo equilátero", "C) Retângulo", "D) Círculo", "E) Trapézio"], correct: 3, explanation: "Gabarito D: O círculo possui infinitos eixos passando por seu centro." },
+        { block: 4, topic: "Medidas de Tendência Central", text: "36. Pontuações: 4, 6, 7, 7, 9. Assinale a afirmativa correta:", options: ["A) Média 7 e moda 6", "B) Mediana 7 e média 6,6", "C) Moda 6 e mediana 6,6", "D) Média 6,6 e mediana 6", "E) Média, moda e mediana iguais a 7"], correct: 1, explanation: "Gabarito B: Média = 33/5 = 6,6. Mediana = elemento central (7)." },
+        { block: 4, topic: "Interpretação de Tabela", text: "37. Atendimentos: Seg(45), Ter(60), Qua(55), Qui(40). Percentual de terça-feira em relação ao total:", options: ["A) 20%", "B) 25%", "C) 30%", "D) 35%", "E) 40%"], correct: 2, explanation: "Gabarito C: Total = 200. Terça = 60. Porcentagem = 60 / 200 = 30%." },
+        { block: 4, topic: "Gráfico de Setores", text: "38. Gráfico de pizza com 400 alunos. O setor de futebol mede 108°. Quantos optaram por futebol?", options: ["A) 90", "B) 108", "C) 120", "D) 144", "E) 150"], correct: 2, explanation: "Gabarito C: Proporção = 108°/360° = 30%. 30% de 400 = 120 alunos." },
+        { block: 4, topic: "Lógica Formal", text: "39. p: 'Trânsito calmo' e q: 'Chegarei no horário'. A linguagem corrente para p -> ~q é:", options: ["A) O trânsito está calmo e não chegarei no horário", "B) Se o trânsito está calmo, então não chegarei no horário", "C) O trânsito não está calmo ou chegarei", "D) Se não está calmo, chegarei", "E) Chegarei se e somente se estiver calmo"], correct: 1, explanation: "Gabarito B: Estrutura 'Se p, então não q'." },
+        { block: 4, topic: "Valores Lógicos", text: "40. P: '2 é primo' (V) e Q: '3 + 5 = 9' (F). Qual proposição é VERDADEIRA?", options: ["A) P e Q", "B) P -> Q", "C) P <-> Q", "D) P ou Q", "E) ~P ou Q"], correct: 3, explanation: "Gabarito D: Na disjunção (OU), V ou F = VERDADEIRO." },
+
+        // Bloco 5 (Q41 - Q50)
+        { block: 5, topic: "Tabela Verdade Condicional", text: "41. A proposição condicional A -> B assume valor FALSO apenas quando:", options: ["A) A é V e B é V", "B) A é V e B é F", "C) A é F e B é V", "D) A é F e B é F", "E) A e B são iguais"], correct: 1, explanation: "Gabarito B: A condicional só é falsa no caso V -> F." },
+        { block: 5, topic: "Negação da Condicional", text: "42. A negação lógica de 'Se chover, então levarei o guarda-chuva' é:", options: ["A) Se não chover, não levo", "B) Chove e não levo o guarda-chuva", "C) Não chove e levo", "D) Se levo, chove", "E) Não chove ou não levo"], correct: 1, explanation: "Gabarito B: Regra do Mané -> Mantém a 1ª (Chove) E nega a 2ª (Não levo)." },
+        { block: 5, topic: "Leis de Morgan", text: "43. Pela Lei de Morgan, a negação de 'Maria é médica e João é engenheiro' é:", options: ["A) Maria não é médica e João não é engenheiro", "B) Maria é médica ou João não é engenheiro", "C) Maria não é médica ou João não é engenheiro", "D) Se Maria não é médica, João não é", "E) Maria é médica e João não é"], correct: 2, explanation: "Gabarito C: Nega ambas as proposições e troca E por OU." },
+        { block: 5, topic: "Equivalência Lógica", text: "44. Uma proposição equivalente a 'Se o candidato estuda, passa no concurso' (p -> q) é:", options: ["A) Se não estuda, não passa", "B) Se passa, estuda", "C) O candidato não estuda ou ele passa no concurso", "D) Estuda e não passa", "E) Se passa, não estuda"], correct: 2, explanation: "Gabarito C: Equivalência disjuntiva ~p ou q ('Nega a 1ª OU mantém a 2ª')." },
+        { block: 5, topic: "Silogismo Lógico", text: "45. Premissas: 'Todo estudante é dedicado' e 'Nenhum atleta é dedicado'. Conclui-se que:", options: ["A) Algum atleta é estudante", "B) Todo dedicado é estudante", "C) Nenhum atleta é estudante", "D) Algum estudante não é dedicado", "E) Todo atleta é estudante"], correct: 2, explanation: "Gabarito C: Os conjuntos Atletas e Dedicados são disjuntos. Logo, nenhum atleta é estudante." },
+        { block: 5, topic: "Argumentação Lógica", text: "46. Premissas: 'Se Ana viaja, Carlos trabalha', 'Se Carlos trabalha, Bia estuda', 'Bia não estuda'. Conclui-se:", options: ["A) Ana viaja e Carlos trabalha", "B) Ana não viaja e Carlos não trabalha", "C) Carlos trabalha e Bia estuda", "D) Ana viaja e Bia estuda", "E) Carlos não trabalha e Ana viaja"], correct: 1, explanation: "Gabarito B: Bia não estuda -> Carlos não trabalha -> Ana não viaja." },
+        { block: 5, topic: "Negação do Quantificador", text: "47. A negação lógica de 'Todos os funcionários do setor foram promovidos' é:", options: ["A) Nenhum funcionário foi promovido", "B) Todos não foram promovidos", "C) Pelo menos um funcionário do setor não foi promovido", "D) Apenas um foi promovido", "E) Todos foram demitidos"], correct: 2, explanation: "Gabarito C: Negação do TODO exige pelo menos uma exceção." },
+        { block: 5, topic: "Anagramas", text: "48. Quantos anagramas distintos podem ser formados com as letras da palavra 'LÓGICA'?", options: ["A) 120", "B) 360", "C) 720", "D) 840", "E) 1.440"], correct: 2, explanation: "Gabarito C: 6 letras distintas -> P6 = 6! = 720 anagramas." },
+        { block: 5, topic: "Combinação Simples", text: "49. De quantas maneiras distintas pode-se formar uma comissão de 3 membros a partir de 8 pessoas?", options: ["A) 24", "B) 56", "C) 112", "D) 336", "E) 512"], correct: 1, explanation: "Gabarito B: Combinação C(8,3) = (8 x 7 x 6) / (3 x 2 x 1) = 56." },
+        { block: 5, topic: "Probabilidade", text: "50. Urna com 5 bolas vermelhas, 3 azuis e 2 amarelas. Sorteando uma bola, a probabilidade de ser azul é:", options: ["A) 1/5", "B) 2/5", "C) 3/10", "D) 1/2", "E) 3/5"], correct: 2, explanation: "Gabarito C: Casos favoráveis (3 azuis) / Total (10 bolas) = 3/10." },
+
+        // Bloco 6: PROVA OFICIAL RECENTE AVANÇA SP - CERQUILHO 03/2025 (Q06 A Q10 DA PROVA)
+        { block: 6, topic: "Divisão Proporcional (Oficial Cerquilho Q06)", text: "51. (Avança SP 2025 - Q06) Ricardo e Lúcia ganharam um prêmio de R$ 10.000,00 e o dividiram em partes proporcionais a 2 e 3, respectivamente. Quanto Ricardo e Lúcia receberam, respectivamente?", options: ["(A) R$ 4.000,00 e R$ 6.000,00", "(B) R$ 5.000,00 e R$ 3.000,00", "(C) R$ 2.000,00 e R$ 2.000,00", "(D) R$ 5.000,00 e R$ 3.333,33", "(E) R$ 5.000,00 e R$ 5.000,00"], correct: 0, explanation: "Gabarito Oficial A: Divisão proporcional em 2 + 3 = 5 partes. Cada parte = 10.000 / 5 = 2.000. Ricardo = 2 x 2.000 = R$ 4.000,00; Lúcia = 3 x 2.000 = R$ 6.000,00." },
+        { block: 6, topic: "Proporcionalidade Direta (Oficial Cerquilho Q07)", text: "52. (Avança SP 2025 - Q07) Karen produz 20 brindes em 2 horas. Mantendo-se o ritmo de produção, quantas peças serão produzidas em 3 horas?", options: ["(A) 25 brindes", "(B) 26 brindes", "(C) 27 brindes", "(D) 28 brindes", "(E) 30 brindes"], correct: 4, explanation: "Gabarito Oficial E: Regra de três simples: 20 brindes em 2h = 10 brindes/hora. Em 3h = 3 x 10 = 30 brindes." },
+        { block: 6, topic: "Geometria e Perímetro (Oficial Cerquilho Q08)", text: "53. (Avança SP 2025 - Q08) A pintura tem 50 cm por 60 cm. Será colocada em moldura com faixa uniforme x em todos os lados. Se o perímetro total com a moldura é 300 cm, qual a largura da faixa (x)?", options: ["(A) 10,0 cm", "(B) 11,0 cm", "(C) 12,0 cm", "(D) 9,0 cm", "(E) 8,0 cm"], correct: 0, explanation: "Gabarito Oficial A: Perímetro = 2(50 + 2x) + 2(60 + 2x) = 220 + 8x. Igualando a 300: 220 + 8x = 300 -> 8x = 80 -> x = 10,0 cm." },
+        { block: 6, topic: "Sequências Numéricas (Oficial Cerquilho Q09)", text: "54. (Avança SP 2025 - Q09) Considere a sequência 1, 4, 9, 16, 25, ... an. Assinale a alternativa que apresenta o 6º termo dessa sequência:", options: ["(A) 30", "(B) 32", "(C) 36", "(D) 42", "(E) 48"], correct: 2, explanation: "Gabarito Oficial C: Sequência de quadrados perfeitos (1², 2², 3², 4², 5²...). O 6º termo é 6² = 36." },
+        { block: 6, topic: "MMC e MDC (Oficial Cerquilho Q10)", text: "55. (Avança SP 2025 - Q10) Considere os números 50 e 105. Assinale a alternativa que apresenta corretamente o MMC e o MDC desses dois números:", options: ["(A) MMC=525 e MDC=6", "(B) MMC=42 e MDC=3", "(C) MMC=5.250 e MDC=5", "(D) MMC=5 e MDC=1.050", "(E) MMC=1.050 e MDC=5"], correct: 4, explanation: "Gabarito Oficial E: Fatoração: 50 = 2 x 5²; 105 = 3 x 5 x 7. MDC = 5; MMC = 2 x 3 x 5² x 7 = 1.050." }
+    ];
+
+    function hideAllScreens() {
+        document.getElementById('screen-home').classList.add('hidden');
+        document.getElementById('screen-hub').classList.add('hidden');
+        document.getElementById('screen-motivation').classList.add('hidden');
+        document.getElementById('screen-result').classList.add('hidden');
+        document.getElementById('btn-quiz-next').classList.add('hidden');
+    }
+
+    function showHomeScreen() {
+        hideAllScreens();
+        document.getElementById('screen-home').classList.remove('hidden');
+        playTechSound('pop');
+    }
+
+    function openMotivationalScreen() {
+        hideAllScreens();
+        document.getElementById('screen-motivation').classList.remove('hidden');
+        playTechSound('pop');
+    }
+
+    function openModuleHub(modNum) {
+        const cpfVal = document.getElementById('input-cpf').value.trim();
+        if (!validarCPF(cpfVal)) {
+            alert("⚠️ Digite um CPF válido antes de iniciar o simulado!");
+            return;
+        }
+        candidatoCPF = cpfVal;
+        activeModule = modNum;
+
+        hideAllScreens();
+        document.getElementById('screen-hub').classList.remove('hidden');
+
+        const mData = modulesData[modNum];
+        document.getElementById('hub-title').innerText = mData.title;
+        document.getElementById('summary-content').innerHTML = mData.summary;
+        document.getElementById('micro-content').innerHTML = mData.microaula;
+
+        currentQuestionsList = allQuestionsDatabase.filter(q => q.block === modNum);
+        currentCardIndex = 0;
+
+        switchHubTab('summary');
+        playTechSound('pop');
+    }
+
+    function switchHubTab(tab) {
+        document.getElementById('hub-tab-summary').classList.add('hidden');
+        document.getElementById('hub-tab-cards').classList.add('hidden');
+        document.getElementById('hub-tab-micro').classList.add('hidden');
+        document.getElementById('hub-tab-quiz').classList.add('hidden');
+        document.getElementById('btn-quiz-next').classList.add('hidden');
+
+        document.getElementById('tab-btn-summary').classList.remove('active');
+        document.getElementById('tab-btn-cards').classList.remove('active');
+        document.getElementById('tab-btn-micro').classList.remove('active');
+        document.getElementById('tab-btn-quiz').classList.remove('active');
+
+        if (tab === 'summary') {
+            document.getElementById('hub-tab-summary').classList.remove('hidden');
+            document.getElementById('tab-btn-summary').classList.add('active');
+        } else if (tab === 'cards') {
+            document.getElementById('hub-tab-cards').classList.remove('hidden');
+            document.getElementById('tab-btn-cards').classList.add('active');
+            renderFlashcard();
+        } else if (tab === 'micro') {
+            document.getElementById('hub-tab-micro').classList.remove('hidden');
+            document.getElementById('tab-btn-micro').classList.add('active');
+        } else if (tab === 'quiz') {
+            document.getElementById('hub-tab-quiz').classList.remove('hidden');
+            document.getElementById('tab-btn-quiz').classList.add('active');
+            document.getElementById('btn-quiz-next').classList.remove('hidden');
+            quizScore = 0;
+            currentQuestionIndex = 0;
+            loadQuestion();
+        }
+        playTechSound('pop');
+    }
+
+    function renderFlashcard() {
+        const mCards = modulesData[activeModule].flashcards;
+        const card = mCards[currentCardIndex];
+        document.getElementById('card-tag').innerText = `Card ${currentCardIndex + 1} de ${mCards.length}`;
+        document.getElementById('card-question').innerText = card.q;
+        document.getElementById('card-answer').innerText = card.a;
+        document.getElementById('flashcard-box').classList.remove('flipped');
+    }
+
+    function flipCard() {
+        document.getElementById('flashcard-box').classList.toggle('flipped');
+        playTechSound('pop');
+    }
+
+    function nextFlashcard() {
+        const mCards = modulesData[activeModule].flashcards;
+        if (currentCardIndex < mCards.length - 1) {
+            currentCardIndex++;
+            renderFlashcard();
+            playTechSound('pop');
+        }
+    }
+
+    function prevFlashcard() {
+        if (currentCardIndex > 0) {
+            currentCardIndex--;
+            renderFlashcard();
+            playTechSound('pop');
+        }
+    }
+
+    function startQuizBlock(blockType) {
+        const cpfVal = document.getElementById('input-cpf').value.trim();
+        if (!validarCPF(cpfVal)) {
+            alert("⚠️ Digite um CPF válido para liberar o simulado!");
+            return;
+        }
+        candidatoCPF = cpfVal;
+
+        if (blockType === 'maratona') {
+            currentQuestionsList = [...allQuestionsDatabase];
+            hideAllScreens();
+            document.getElementById('screen-hub').classList.remove('hidden');
+            document.getElementById('hub-title').innerText = "🚀 Maratona Geral (55 Questões)";
+            
+            document.getElementById('hub-tab-summary').classList.add('hidden');
+            document.getElementById('hub-tab-cards').classList.add('hidden');
+            document.getElementById('hub-tab-micro').classList.add('hidden');
+            document.getElementById('hub-tab-quiz').classList.remove('hidden');
+            document.getElementById('btn-quiz-next').classList.remove('hidden');
+            
+            quizScore = 0;
+            currentQuestionIndex = 0;
+            loadQuestion();
+        }
+    }
+
+    function loadQuestion() {
+        questionAnswered = false;
+        selectedOptionIndex = null;
+        const q = currentQuestionsList[currentQuestionIndex];
+        const pct = ((currentQuestionIndex) / currentQuestionsList.length) * 100;
+
+        document.getElementById('quiz-progress').style.width = pct + '%';
+        document.getElementById('quiz-counter').innerText = `Questão ${currentQuestionIndex + 1} de ${currentQuestionsList.length}`;
+        document.getElementById('quiz-block-title').innerText = `Bloco ${q.block}`;
+        document.getElementById('quiz-topic').innerText = q.topic;
+        document.getElementById('quiz-question-text').innerText = q.text;
+
+        const optionsContainer = document.getElementById('quiz-options-container');
+        optionsContainer.innerHTML = '';
+
+        q.options.forEach((optText, idx) => {
+            const prefix = String.fromCharCode(65 + idx);
+            const optDiv = document.createElement('div');
+            optDiv.className = 'option-item';
+            optDiv.onclick = () => selectOption(idx);
+            optDiv.innerHTML = `
+                <div class="option-prefix">${prefix}</div>
+                <div>${optText.substring(3)}</div>
+            `;
+            optionsContainer.appendChild(optDiv);
+        });
+
+        const feedbackBox = document.getElementById('quiz-feedback-box');
+        feedbackBox.className = 'hidden';
+
+        const nextBtn = document.getElementById('btn-quiz-next');
+        nextBtn.innerText = "Verificar Resposta →";
+        nextBtn.className = "btn-cyber btn-green";
+    }
+
+    function selectOption(idx) {
+        if (questionAnswered) return;
+        selectedOptionIndex = idx;
+        const items = document.querySelectorAll('.option-item');
+        items.forEach((item, i) => {
+            if (i === idx) item.classList.add('selected');
+            else item.classList.remove('selected');
+        });
+        playTechSound('pop');
+    }
+
+    function nextQuestion() {
+        const nextBtn = document.getElementById('btn-quiz-next');
+        const q = currentQuestionsList[currentQuestionIndex];
+        const feedbackBox = document.getElementById('quiz-feedback-box');
+
+        if (!questionAnswered) {
+            // PASSO 1: VERIFICAR E CONTABILIZAR A RESPOSTA
+            if (selectedOptionIndex === null) {
+                alert("Selecione uma alternativa!");
+                return;
+            }
+
+            questionAnswered = true;
+
+            const items = document.querySelectorAll('.option-item');
+            items.forEach((item, i) => {
+                item.style.pointerEvents = 'none';
+                if (i === q.correct) item.classList.add('correct');
+                else if (i === selectedOptionIndex) item.classList.add('wrong');
+            });
+
+            feedbackBox.classList.remove('hidden');
+            if (selectedOptionIndex === q.correct) {
+                quizScore++;
+                addXP(10);
+                playTechSound('correct');
+                feedbackBox.style.backgroundColor = 'rgba(57, 255, 20, 0.15)';
+                feedbackBox.style.color = 'var(--neon-green)';
+                feedbackBox.style.border = '1px solid var(--neon-green)';
+                feedbackBox.innerHTML = `<strong>✨ Resposta Correta!</strong><br>${q.explanation}`;
+            } else {
+                playTechSound('wrong');
+                feedbackBox.style.backgroundColor = 'rgba(255, 0, 127, 0.15)';
+                feedbackBox.style.color = 'var(--neon-pink)';
+                feedbackBox.style.border = '1px solid var(--neon-pink)';
+                feedbackBox.innerHTML = `<strong>❌ Resposta Incorreta.</strong><br>${q.explanation}`;
+            }
+
+            if (currentQuestionIndex === currentQuestionsList.length - 1) {
+                nextBtn.innerText = "Concluir Simulado 🏆";
+                nextBtn.className = "btn-cyber btn-pink";
+            } else {
+                nextBtn.innerText = "Próxima Questão →";
+                nextBtn.className = "btn-cyber btn-blue";
+            }
+        } else {
+            // PASSO 2: AVANÇAR PARA A PRÓXIMA QUESTÃO OU FINALIZAR
+            if (currentQuestionIndex < currentQuestionsList.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+    }
+
+    function finishQuiz() {
+        hideAllScreens();
+        document.getElementById('screen-result').classList.remove('hidden');
+
+        const total = currentQuestionsList.length;
+        const pct = total > 0 ? Math.round((quizScore / total) * 100) : 0;
+
+        document.getElementById('res-cpf-tag').innerText = `Titular do Registro: CPF ${candidatoCPF}`;
+        document.getElementById('res-score-pct').innerText = `${pct}%`;
+        document.getElementById('res-score-details').innerText = `Você acertou ${quizScore} de ${total} questões (${pct}% de acertos)!`;
+
+        playTechSound('correct');
+    }
+</script>
+
+</body>
+</html>
